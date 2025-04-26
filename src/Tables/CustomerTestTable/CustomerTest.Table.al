@@ -155,11 +155,22 @@ table 50301 CustomerExt
         }
     }
 
-    trigger OnInsert()
+    // Triển khai interface Document Attachment Supported
+    procedure HasDocumentAttachment(): Boolean
     var
-        NoSeriesMgt: Codeunit NoSeriesManagement;
+        DocumentAttachment: Record "Document Attachment";
     begin
-        if "Test ID" = '' then
-            "Test ID" := NoSeriesMgt.GetNextNo("No. Series", WorkDate(), true);
+        DocumentAttachment.SetRange("Table ID", Database::CustomerExt);
+        DocumentAttachment.SetRange("No.", "Test ID");
+        exit(not DocumentAttachment.IsEmpty);
+    end;
+
+    procedure DrillDownDocumentAttachment()
+    var
+        DocumentAttachment: Record "Document Attachment";
+    begin
+        DocumentAttachment.SetRange("Table ID", Database::CustomerExt);
+        DocumentAttachment.SetRange("No.", "Test ID");
+        Page.Run(Page::"Document Attachment Details", DocumentAttachment);
     end;
 }
