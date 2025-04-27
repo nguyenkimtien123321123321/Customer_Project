@@ -181,42 +181,12 @@ table 50302 "Sales Order Test Header"
     }
 
     // ĐÁNH SỐ TỰ ĐỘNG
-    var
-        NoSeriesMgt: Codeunit NoSeriesManagement;
-
     trigger OnInsert()
     var
-        NoSeriesCode: Code[20];
+        TestNoSeriesMgt: Codeunit "Test No Series Management";
     begin
         if "No." = '' then begin
-            NoSeriesCode := 'SOTEST'; // Dòng số cố định
-            SetupNoSeries(NoSeriesCode); // Tạo dòng số nếu chưa tồn tại
-            "No. Series" := NoSeriesCode;
-            NoSeriesMgt.InitSeries(NoSeriesCode, "No. Series", 0D, "No.", "No. Series");
-        end;
-    end;
-
-    local procedure SetupNoSeries(NoSeriesCode: Code[20])
-    var
-        NoSeries: Record "No. Series";
-        NoSeriesLine: Record "No. Series Line";
-    begin
-        // Kiểm tra nếu dòng số chưa tồn tại thì tạo mới
-        if not NoSeries.Get(NoSeriesCode) then begin
-            NoSeries.Init();
-            NoSeries.Code := NoSeriesCode;
-            NoSeries.Description := 'Sales Order Test Nos.';
-            NoSeries."Default Nos." := true;
-            NoSeries."Manual Nos." := false;
-            NoSeries.Insert(true);
-
-            // Tạo dòng số chi tiết
-            NoSeriesLine.Init();
-            NoSeriesLine."Series Code" := NoSeriesCode;
-            NoSeriesLine."Starting No." := '101001'; // Định dạng giống hệ thống mặc định
-            NoSeriesLine."Ending No." := '999999';
-            NoSeriesLine."Increment-by No." := 1;
-            NoSeriesLine.Insert(true);
+            TestNoSeriesMgt.InitSeries('SOTEST', "No. Series", "No.");
         end;
     end;
 }

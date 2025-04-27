@@ -79,10 +79,12 @@ page 50310 "Sales Order Test Subform"
                 PromotedCategory = Process;
 
                 trigger OnAction()
+                var
+                    SalesOrderTestLineMgt: Codeunit "S_Order Test Line Management";
                 begin
                     Rec.Init();
                     Rec."Document No." := CurrPage.Caption;
-                    Rec."Line No." := GetNextLineNo();
+                    Rec."Line No." := SalesOrderTestLineMgt.GetNextLineNo(Rec."Document No.");
                     Rec.Insert(true);
                 end;
             }
@@ -95,11 +97,10 @@ page 50310 "Sales Order Test Subform"
                 PromotedCategory = Process;
 
                 trigger OnAction()
+                var
+                    SalesOrderTestLineMgt: Codeunit "S_Order Test Line Management";
                 begin
-                    if Confirm('Are you sure you want to delete this line?', false) then begin
-                        Rec.Delete(true);
-                        UpdateHeaderAmounts();
-                    end;
+                    SalesOrderTestLineMgt.DeleteLine(Rec);
                 end;
             }
             action(SelectItems)
@@ -112,17 +113,18 @@ page 50310 "Sales Order Test Subform"
 
                 trigger OnAction()
                 var
-                    Item: Record Item;
-                    ItemList: Page "Item List";
+                    ProductTest: Record "Product Test";
+                    ProductTestList: Page "Product Test List";
+                    SalesOrderTestLineMgt: Codeunit "S_Order Test Line Management";
                 begin
-                    ItemList.LookupMode(true);
-                    if ItemList.RunModal() = Action::LookupOK then begin
-                        ItemList.GetRecord(Item);
+                    ProductTestList.LookupMode(true);
+                    if ProductTestList.RunModal() = Action::LookupOK then begin
+                        ProductTestList.GetRecord(ProductTest);
                         Rec.Init();
                         Rec."Document No." := CurrPage.Caption;
-                        Rec."Line No." := GetNextLineNo();
+                        Rec."Line No." := SalesOrderTestLineMgt.GetNextLineNo(Rec."Document No.");
                         Rec.Type := Rec.Type::Item;
-                        Rec."No." := Item."No.";
+                        Rec."No." := ProductTest."No.";
                         Rec.Insert(true);
                     end;
                 end;
@@ -130,39 +132,28 @@ page 50310 "Sales Order Test Subform"
         }
     }
 
-    local procedure GetNextLineNo(): Integer
-    var
-        SalesOrderTestLine: Record "_Sales Order Test Line";
+    trigger OnModifyRecord(): Boolean
     begin
-        SalesOrderTestLine.SetRange("Document No.", Rec."Document No.");
-        if SalesOrderTestLine.FindLast() then
-            exit(SalesOrderTestLine."Line No." + 10000)
-        else
-            exit(10000);
+        UpdateHeaderAmounts();
+        exit(true);
+    end;
+
+    trigger OnInsertRecord(BelowxRec: Boolean): Boolean
+    begin
+        UpdateHeaderAmounts();
+        exit(true);
+    end;
+
+    trigger OnDeleteRecord(): Boolean
+    begin
+        UpdateHeaderAmounts();
+        exit(true);
     end;
 
     local procedure UpdateHeaderAmounts()
     var
-        SalesOrderTestHeader: Record "Sales Order Test Header";
-        SalesOrderTestLine: Record "_Sales Order Test Line";
-        TotalAmount: Decimal;
-        TotalAmountInclVAT: Decimal;
-        TotalVAT: Decimal;
+        SalesOrderTestMgt: Codeunit "Sales Order Test Management";
     begin
-        SalesOrderTestLine.SetRange("Document No.", Rec."Document No.");
-        if SalesOrderTestLine.FindSet() then
-            repeat
-                TotalAmount += SalesOrderTestLine."Line Amount";
-                TotalVAT += SalesOrderTestLine."Line Amount" * (SalesOrderTestLine."VAT %" / 100);
-                TotalAmountInclVAT += SalesOrderTestLine."Line Amount" * (1 + SalesOrderTestLine."VAT %" / 100);
-            until SalesOrderTestLine.Next() = 0;
-
-        if SalesOrderTestHeader.Get(Rec."Document No.") then begin
-            SalesOrderTestHeader."Subtotal Excl. VAT" := TotalAmount;
-            SalesOrderTestHeader."Total VAT" := TotalVAT;
-            SalesOrderTestHeader."Amount" := TotalAmount - SalesOrderTestHeader."Invoice Discount Amount";
-            SalesOrderTestHeader."Amount Including VAT" := TotalAmountInclVAT - SalesOrderTestHeader."Invoice Discount Amount";
-            SalesOrderTestHeader.Modify();
-        end;
+        SalesOrderTestMgt.UpdateHeaderAmountsFromLine(Rec."Document No.");
     end;
 }

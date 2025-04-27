@@ -447,8 +447,10 @@ page 50308 "Sales Order Test Card"
         NoSeriesMgt: Codeunit NoSeriesManagement;
 
     trigger OnAfterGetRecord()
+    var
+        SalesOrderTestMgt: Codeunit "Sales Order Test Management";
     begin
-        CalcTotals();
+        SalesOrderTestMgt.CalcTotals(Rec);
     end;
 
     local procedure CalcTotals()
