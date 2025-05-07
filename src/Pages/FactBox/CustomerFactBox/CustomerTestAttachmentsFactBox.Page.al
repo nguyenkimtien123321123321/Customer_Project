@@ -1,4 +1,4 @@
-page 50306 "Document Attachments FactBox"
+page 50306 "Documents Attachment FactBox"
 {
     Caption = 'Attachments';
     PageType = CardPart;
