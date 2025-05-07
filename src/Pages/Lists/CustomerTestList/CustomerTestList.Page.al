@@ -83,7 +83,7 @@ page 50302 "Customer Test List"
             {
                 ApplicationArea = All;
                 Caption = 'Attachments';
-                SubPageLink = "Table ID" = const(50100), "No." = field("Test ID"); // Liên kết với "Test ID" của CustomerExt
+                SubPageLink = "Table ID" = const(50301), "No." = field("Test ID");
             }
         }
     }

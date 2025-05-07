@@ -66,16 +66,25 @@ page 50313 "CustomerExt List"
     {
         area(Processing)
         {
-            action(New)
-            {
-                Caption = 'New';
-                ApplicationArea = All;
-                Image = New;
-                Promoted = true;
-                PromotedCategory = Process;
-                RunObject = Page "Customer Test Card";
-                RunPageMode = Create;
-            }
+            // action(NewCustomer)
+            // {
+            //     Caption = 'New';
+            //     ApplicationArea = All;
+            //     Image = New;
+
+            //     trigger OnAction()
+            //     var
+            //         CustomerRec: Record CustomerExt;
+            //         CustomerCard: Page "Customer Test Card";
+            //         TestNoSeriesMgt: Codeunit "Test No Series Management";
+            //     begin
+            //         CustomerRec.Init();
+            //         TestNoSeriesMgt.InitSeries('CUSTTEST', CustomerRec."No. Series", CustomerRec."No.");
+            //         CustomerRec.Insert(true);
+            //         CustomerCard.SetRecord(CustomerRec);
+            //         CustomerCard.Run();
+            //     end;
+            // }
         }
     }
 }
