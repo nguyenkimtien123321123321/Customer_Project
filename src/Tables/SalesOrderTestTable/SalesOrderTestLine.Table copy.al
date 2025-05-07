@@ -25,16 +25,21 @@ table 50303 "_Sales Order Test Line"
         {
             Caption = 'No.';
             DataClassification = CustomerContent;
-            TableRelation = if (Type = const(Item)) Item;
+            TableRelation = if (Type = const(Item)) "Product Test";
 
             trigger OnValidate()
             var
-                Item: Record Item;
+                ProductTestRec: Record "Product Test";
             begin
-                if Item.Get("No.") then begin
-                    Description := Item.Description;
-                    "Unit Price Excl. VAT" := Item."Unit Price";
-                    "Unit of Measure Code" := Item."Base Unit of Measure";
+                if ProductTestRec.Get("No.") then begin
+                    Description := ProductTestRec.Description;
+                    "Unit Price Excl. VAT" := ProductTestRec."Unit Price";
+                    "Unit of Measure Code" := ProductTestRec."Base Unit of Measure";
+                    CalcLineAmount();
+                end else begin
+                    Description := '';
+                    "Unit Price Excl. VAT" := 0;
+                    "Unit of Measure Code" := '';
                     CalcLineAmount();
                 end;
             end;
@@ -43,6 +48,17 @@ table 50303 "_Sales Order Test Line"
         {
             Caption = 'Item Reference';
             DataClassification = CustomerContent;
+
+            trigger OnValidate()
+            var
+                ProductTestRec: Record "Product Test";
+            begin
+                ProductTestRec.Reset();
+                ProductTestRec.SetFilter("No.", '%1', "Item Reference");
+                if ProductTestRec.FindFirst() then begin
+                    Validate("No.", ProductTestRec."No.");
+                end;
+            end;
         }
         field(6; Description; Text[100])
         {

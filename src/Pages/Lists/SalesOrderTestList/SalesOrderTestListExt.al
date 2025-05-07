@@ -1,100 +1,10 @@
-page 50307 "Sales Order Test List"
+pageextension 50327 SalesOrderTestListExt extends "Sales Order Test List"
 {
-    Caption = 'Sales Order Test List';
-    PageType = List;
-    SourceTable = "Sales Order Test Header";
-    UsageCategory = Lists;
-    ApplicationArea = All;
-    CardPageID = "Sales Order Test Card";
-
-    layout
-    {
-        area(content)
-        {
-            repeater(Group)
-            {
-                field("No."; Rec."No.")
-                {
-                    ApplicationArea = All;
-                }
-                field("Sell-to Customer No."; Rec."Sell-to Customer No.")
-                {
-                    ApplicationArea = All;
-                }
-                field("Sell-to Customer Name"; Rec."Sell-to Customer Name")
-                {
-                    ApplicationArea = All;
-                }
-                field("External Document No."; Rec."External Document No.")
-                {
-                    ApplicationArea = All;
-                }
-                field("Location Code"; Rec."Location Code")
-                {
-                    ApplicationArea = All;
-                }
-                field("Assigned User ID"; Rec."Assigned User ID")
-                {
-                    ApplicationArea = All;
-                }
-                field("Document Date"; Rec."Document Date")
-                {
-                    ApplicationArea = All;
-                }
-                field(Status; Rec.Status)
-                {
-                    ApplicationArea = All;
-                }
-                field("Completely Shipped"; Rec."Completely Shipped")
-                {
-                    ApplicationArea = All;
-                }
-                field("Amount Shipped Not Invoiced (LCY)"; Rec."Amount Shipped Not Invoiced (LCY)")
-                {
-                    ApplicationArea = All;
-                }
-                field("Amount Invoiced (LCY)"; Rec."Amount Invoiced (LCY)")
-                {
-                    ApplicationArea = All;
-                }
-                field("Amount"; Rec."Amount")
-                {
-                    ApplicationArea = All;
-                }
-                field("Amount Including VAT"; Rec."Amount Including VAT")
-                {
-                    ApplicationArea = All;
-                }
-            }
-        }
-        area(factboxes)
-        {
-            part("Customer Statistics"; "CustomerExt Statistics FactBox")
-            {
-                ApplicationArea = All;
-                Caption = 'Customer Statistics';
-                SubPageLink = "Test ID" = field("Sell-to Customer No.");
-            }
-            part("Customer Details"; "CustomerExt Details FactBox")
-            {
-                ApplicationArea = All;
-                Caption = 'Customer Details';
-                SubPageLink = "Test ID" = field("Sell-to Customer No.");
-            }
-            part("Attachments"; "Document Attachment FactBox")
-            {
-                ApplicationArea = All;
-                Caption = 'Attachments';
-
-            }
-        }
-    }
-
     actions
     {
-        area(Processing)
+        addlast(processing)
         {
-            group(Home)
+            group(HomeGroup)
             {
                 Caption = 'Home';
                 Image = Home;
@@ -103,9 +13,6 @@ page 50307 "Sales Order Test List"
                     Caption = 'New';
                     ApplicationArea = All;
                     Image = New;
-                    Promoted = true;
-                    PromotedCategory = Process;
-                    PromotedIsBig = true;
 
                     trigger OnAction()
                     var
@@ -123,9 +30,6 @@ page 50307 "Sales Order Test List"
                     Caption = 'Delete';
                     ApplicationArea = All;
                     Image = Delete;
-                    Promoted = true;
-                    PromotedCategory = Process;
-                    PromotedIsBig = true;
 
                     trigger OnAction()
                     begin
@@ -138,8 +42,7 @@ page 50307 "Sales Order Test List"
                     Caption = 'Create Warehouse Shipment';
                     ApplicationArea = All;
                     Image = Shipment;
-                    Promoted = true;
-                    PromotedCategory = Process;
+
 
                     trigger OnAction()
                     begin
@@ -151,8 +54,7 @@ page 50307 "Sales Order Test List"
                     Caption = 'Create Inventory Put-away/Pick...';
                     ApplicationArea = All;
                     Image = Inventory;
-                    Promoted = true;
-                    PromotedCategory = Process;
+
 
                     trigger OnAction()
                     begin
@@ -160,7 +62,7 @@ page 50307 "Sales Order Test List"
                     end;
                 }
             }
-            group(Release1)
+            group(ReleaseGroup)
             {
                 Caption = 'Release';
                 Image = ReleaseDoc;
@@ -169,8 +71,7 @@ page 50307 "Sales Order Test List"
                     Caption = 'Release';
                     ApplicationArea = All;
                     Image = ReleaseDoc;
-                    Promoted = true;
-                    PromotedCategory = Process;
+
 
                     trigger OnAction()
                     begin
@@ -183,8 +84,7 @@ page 50307 "Sales Order Test List"
                     Caption = 'Reopen';
                     ApplicationArea = All;
                     Image = ReOpen;
-                    Promoted = true;
-                    PromotedCategory = Process;
+
 
                     trigger OnAction()
                     begin
@@ -193,7 +93,7 @@ page 50307 "Sales Order Test List"
                     end;
                 }
             }
-            group(Post1)
+            group(PostGroup)
             {
                 Caption = 'Post...';
                 Image = Post;
@@ -202,8 +102,7 @@ page 50307 "Sales Order Test List"
                     Caption = 'Post';
                     ApplicationArea = All;
                     Image = Post;
-                    Promoted = true;
-                    PromotedCategory = Process;
+
 
                     trigger OnAction()
                     begin
@@ -215,8 +114,7 @@ page 50307 "Sales Order Test List"
                     Caption = 'Post and Send...';
                     ApplicationArea = All;
                     Image = PostMail;
-                    Promoted = true;
-                    PromotedCategory = Process;
+
 
                     trigger OnAction()
                     begin
@@ -228,8 +126,7 @@ page 50307 "Sales Order Test List"
                     Caption = 'Post Batch...';
                     ApplicationArea = All;
                     Image = PostBatch;
-                    Promoted = true;
-                    PromotedCategory = Process;
+
 
                     trigger OnAction()
                     begin
@@ -241,8 +138,7 @@ page 50307 "Sales Order Test List"
                     Caption = 'Preview Posting';
                     ApplicationArea = All;
                     Image = View;
-                    Promoted = true;
-                    PromotedCategory = Process;
+
 
                     trigger OnAction()
                     begin
@@ -250,7 +146,7 @@ page 50307 "Sales Order Test List"
                     end;
                 }
             }
-            group(PrintSend)
+            group(PrintSendGroup)
             {
                 Caption = 'Print/Send';
                 Image = Print;
@@ -259,8 +155,7 @@ page 50307 "Sales Order Test List"
                     Caption = 'Print Confirmation...';
                     ApplicationArea = All;
                     Image = Print;
-                    Promoted = true;
-                    PromotedCategory = Process;
+
 
                     trigger OnAction()
                     begin
@@ -272,8 +167,7 @@ page 50307 "Sales Order Test List"
                     Caption = 'Pick Instruction';
                     ApplicationArea = All;
                     Image = PickLines;
-                    Promoted = true;
-                    PromotedCategory = Process;
+
 
                     trigger OnAction()
                     begin
@@ -285,8 +179,7 @@ page 50307 "Sales Order Test List"
                     Caption = 'Email Confirmation...';
                     ApplicationArea = All;
                     Image = Email;
-                    Promoted = true;
-                    PromotedCategory = Process;
+
 
                     trigger OnAction()
                     begin
@@ -298,8 +191,7 @@ page 50307 "Sales Order Test List"
                     Caption = 'Work Order...';
                     ApplicationArea = All;
                     Image = WorkCenter;
-                    Promoted = true;
-                    PromotedCategory = Process;
+
 
                     trigger OnAction()
                     begin
@@ -311,8 +203,7 @@ page 50307 "Sales Order Test List"
                     Caption = 'Attach as PDF...';
                     ApplicationArea = All;
                     Image = Attach;
-                    Promoted = true;
-                    PromotedCategory = Process;
+
 
                     trigger OnAction()
                     begin
@@ -320,7 +211,7 @@ page 50307 "Sales Order Test List"
                     end;
                 }
             }
-            group(Order)
+            group(OrderGroup)
             {
                 Caption = 'Order';
                 Image = Order;
@@ -329,8 +220,7 @@ page 50307 "Sales Order Test List"
                     Caption = 'Dimensions';
                     ApplicationArea = All;
                     Image = Dimensions;
-                    Promoted = true;
-                    PromotedCategory = Process;
+
 
                     trigger OnAction()
                     var
@@ -344,8 +234,7 @@ page 50307 "Sales Order Test List"
                     Caption = 'Statistics';
                     ApplicationArea = All;
                     Image = Statistics;
-                    Promoted = true;
-                    PromotedCategory = Process;
+
 
                     trigger OnAction()
                     begin
@@ -357,8 +246,7 @@ page 50307 "Sales Order Test List"
                     Caption = 'Comments';
                     ApplicationArea = All;
                     Image = Comment;
-                    Promoted = true;
-                    PromotedCategory = Process;
+
 
                     trigger OnAction()
                     begin
@@ -370,8 +258,7 @@ page 50307 "Sales Order Test List"
                     Caption = 'Approvals';
                     ApplicationArea = All;
                     Image = Approvals;
-                    Promoted = true;
-                    PromotedCategory = Process;
+
 
                     trigger OnAction()
                     begin
@@ -383,8 +270,7 @@ page 50307 "Sales Order Test List"
                     Caption = 'Shipments';
                     ApplicationArea = All;
                     Image = Shipment;
-                    Promoted = true;
-                    PromotedCategory = Process;
+
 
                     trigger OnAction()
                     begin
@@ -396,28 +282,13 @@ page 50307 "Sales Order Test List"
                     Caption = 'Invoices';
                     ApplicationArea = All;
                     Image = Invoice;
-                    Promoted = true;
-                    PromotedCategory = Process;
+
 
                     trigger OnAction()
                     begin
                         Message('Invoices logic to be implemented.');
                     end;
                 }
-            }
-        }
-        area(navigation)
-        {
-            action(OpenCard)
-            {
-                Caption = 'Open Card';
-                ApplicationArea = All;
-                Image = Edit;
-                Promoted = true;
-                PromotedCategory = Process;
-                PromotedIsBig = true;
-                RunObject = Page "Sales Order Test Card";
-                RunPageLink = "No." = field("No.");
             }
         }
     }

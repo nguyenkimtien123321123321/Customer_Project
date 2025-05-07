@@ -25,5 +25,16 @@ tableextension 50312 CustomerExtention extends "CustomerExt"
             DataClassification = CustomerContent;
             AutoFormatType = 1;
         }
+        field(30; "Picture"; Media)
+        {
+            Caption = 'Picture';
+            DataClassification = ToBeClassified;
+        }
+        field(31; "No."; Code[20])
+        {
+            Caption = 'No.';
+            DataClassification = ToBeClassified;
+            NotBlank = true;
+        }
     }
 }
