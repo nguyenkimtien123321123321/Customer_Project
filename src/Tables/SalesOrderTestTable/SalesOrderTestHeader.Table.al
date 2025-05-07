@@ -17,33 +17,11 @@ table 50302 "Sales Order Test Header"
             Caption = 'Sell-to Customer No.';
             DataClassification = CustomerContent;
             TableRelation = CustomerExt."Test ID";
-
-            // trigger OnValidate()
-            // var
-            //     CustomerExt: Record CustomerExt;
-            // begin
-            //     if CustomerExt.Get("Sell-to Customer No.") then begin
-            //         "Sell-to Customer Name" := CustomerExt."Test Name";
-            //         "Sell-to Contact" := CustomerExt.Contact;
-            //     end;
-            // end;
             trigger OnValidate()
             var
-                CustomerExt: Record CustomerExt;
-                Contact: Record Contact;
+                CustomerTestMgt: Codeunit "Customer Test Management";
             begin
-                if CustomerExt.Get("Sell-to Customer No.") then begin
-                    "Sell-to Customer Name" := CustomerExt."Test Name";
-                    // Tìm liên hệ mặc định của khách hàng
-                    Contact.SetRange("Company No.", CustomerExt."Test ID");
-                    if Contact.FindFirst() then
-                        "Sell-to Contact" := Contact.Name
-                    else
-                        "Sell-to Contact" := '';
-                end else begin
-                    "Sell-to Customer Name" := '';
-                    "Sell-to Contact" := '';
-                end;
+                CustomerTestMgt.ValidateSellToCustomerNo(Rec, "Sell-to Customer No.");
             end;
         }
         field(3; "Sell-to Customer Name"; Text[100])
