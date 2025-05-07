@@ -17,16 +17,42 @@ page 50303 "Customer Test Card"
                 {
                     ApplicationArea = All;
                     Caption = 'No.';
-                    Editable = true;
+                    AssistEdit = true;
 
                     trigger OnAssistEdit()
+                    var
+                        NoSeries: Record "No. Series";
+                        NoSeriesSelectionList: Page "NoSeriesSelectionList";
+                        SelectedNoSeries: Code[20];
+                        LastNoSeriesSetup: Record "LastNoSeriesSetup";
                     begin
-                        if Rec."Test ID" = '' then begin
-                            if numberSeries.SelectSeries('demo', xRec."Test ID", Rec."Test ID") then begin
-                                numberSeries.SetSeries(Rec."Test ID");
-                            end
+                        NoSeries.Reset();
+                        NoSeriesSelectionList.SetTableView(NoSeries);
+                        NoSeriesSelectionList.LookupMode(true);
+                        if NoSeriesSelectionList.RunModal() = Action::LookupOK then begin
+                            SelectedNoSeries := NoSeriesSelectionList.GetSelectedNoSeries();
+                            if SelectedNoSeries <> '' then begin
+                                Rec."No. Series" := SelectedNoSeries;
+                                Rec."Test ID" := NoSeriesMgt.GetNextNo(SelectedNoSeries, WorkDate(), true);
 
-                        end
+                                // Lưu No. Series vào bảng LastNoSeriesSetup
+                                if not LastNoSeriesSetup.Get('DEFAULT') then begin
+                                    LastNoSeriesSetup.Init();
+                                    LastNoSeriesSetup."Primary Key" := 'DEFAULT';
+                                    LastNoSeriesSetup.Insert();
+                                end;
+                                LastNoSeriesSetup."Last No. Series" := SelectedNoSeries;
+                                LastNoSeriesSetup.Modify();
+
+                                CurrPage.Update();
+                            end;
+                        end;
+                    end;
+
+                    trigger OnValidate()
+                    begin
+                        if Rec."Test ID" = '' then
+                            Error('Please select a No. Series using the AssistEdit button to generate a valid Test ID.');
                     end;
                 }
                 field("Test Name"; Rec."Test Name")
@@ -64,6 +90,7 @@ page 50303 "Customer Test Card"
                     ApplicationArea = All;
                     Caption = 'Costs (LCY)';
                 }
+
             }
             group(AddressAndContact)
             {
@@ -154,9 +181,8 @@ page 50303 "Customer Test Card"
             }
         }
     }
-
     var
-        numberSeries: Codeunit NoSeriesManagement;
+        NoSeriesMgt: Codeunit NoSeriesManagement;
 
     trigger OnAfterGetRecord()
     begin
@@ -164,19 +190,35 @@ page 50303 "Customer Test Card"
     end;
 
     trigger OnNewRecord(BelowxRec: Boolean)
+    var
+        LastNoSeriesSetup: Record "LastNoSeriesSetup";
     begin
+        Rec.Init();
+        if LastNoSeriesSetup.Get('DEFAULT') then begin
+            if LastNoSeriesSetup."Last No. Series" <> '' then begin
+                Rec."No. Series" := LastNoSeriesSetup."Last No. Series";
+                Rec."Test ID" := NoSeriesMgt.GetNextNo(Rec."No. Series", WorkDate(), true);
+            end;
+        end;
         CurrPage.Update(false);
     end;
 
     trigger OnInsertRecord(BelowxRec: Boolean): Boolean
     begin
-        // CurrPage.Update(true);
+        if Rec."Test ID" = '' then
+            Error('Please select a No. Series using the AssistEdit button to generate a valid Test ID.');
+
+        // Kiểm tra nếu bản ghi đã tồn tại
+        if Rec.Get(Rec."Test ID") then
+            Error('A record with Test ID %1 already exists.', Rec."Test ID");
+
         exit(true);
     end;
 
     trigger OnModifyRecord(): Boolean
     begin
-        // CurrPage.Update(true);
+        if Rec."Test ID" = '' then
+            Error('Please select a No. Series using the AssistEdit button to generate a valid Test ID.');
         exit(true);
     end;
 }

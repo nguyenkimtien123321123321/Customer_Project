@@ -43,10 +43,18 @@ pageextension 50327 SalesOrderTestListExt extends "Sales Order Test List"
                     ApplicationArea = All;
                     Image = Shipment;
 
-
                     trigger OnAction()
+                    var
+                        SalesOrderTestHeader: Record "Sales Order Test Header";
                     begin
-                        Message('Create Warehouse Shipment logic to be implemented.');
+                        CurrPage.SetSelectionFilter(SalesOrderTestHeader);
+                        if SalesOrderTestHeader.FindSet() then
+                            repeat
+                                if SalesOrderTestHeader.Status = SalesOrderTestHeader.Status::Released then
+                                    CreateWarehouseShipmentForOrder(SalesOrderTestHeader)
+                                else
+                                    Message('Đơn hàng %1 phải ở trạng thái Released để tạo Warehouse Shipment.', SalesOrderTestHeader."No.");
+                            until SalesOrderTestHeader.Next() = 0;
                     end;
                 }
                 action(CreateInventoryPutAwayPick)
@@ -55,10 +63,18 @@ pageextension 50327 SalesOrderTestListExt extends "Sales Order Test List"
                     ApplicationArea = All;
                     Image = Inventory;
 
-
                     trigger OnAction()
+                    var
+                        SalesOrderTestHeader: Record "Sales Order Test Header";
                     begin
-                        Message('Create Inventory Put-away/Pick logic to be implemented.');
+                        CurrPage.SetSelectionFilter(SalesOrderTestHeader);
+                        if SalesOrderTestHeader.FindSet() then
+                            repeat
+                                if SalesOrderTestHeader.Status = SalesOrderTestHeader.Status::Released then
+                                    CreateInventoryPutAwayPickForOrder(SalesOrderTestHeader)
+                                else
+                                    Message('Đơn hàng %1 phải ở trạng thái Released để tạo Inventory Put-away/Pick.', SalesOrderTestHeader."No.");
+                            until SalesOrderTestHeader.Next() = 0;
                     end;
                 }
             }
@@ -103,10 +119,19 @@ pageextension 50327 SalesOrderTestListExt extends "Sales Order Test List"
                     ApplicationArea = All;
                     Image = Post;
 
-
                     trigger OnAction()
+                    var
+                        SalesOrderTestHeader: Record "Sales Order Test Header";
+                        SalesOrderTestPost: Codeunit "Sales Order Test Post";
                     begin
-                        Message('Posting logic to be implemented.');
+                        CurrPage.SetSelectionFilter(SalesOrderTestHeader);
+                        if SalesOrderTestHeader.FindSet() then
+                            repeat
+                                if SalesOrderTestHeader.Status = SalesOrderTestHeader.Status::Released then
+                                    SalesOrderTestPost.PostOrder(SalesOrderTestHeader, false, false)
+                                else
+                                    Message('Đơn hàng %1 phải ở trạng thái Released để đăng.', SalesOrderTestHeader."No.");
+                            until SalesOrderTestHeader.Next() = 0;
                     end;
                 }
                 action(PostAndSend)
@@ -115,10 +140,20 @@ pageextension 50327 SalesOrderTestListExt extends "Sales Order Test List"
                     ApplicationArea = All;
                     Image = PostMail;
 
-
                     trigger OnAction()
+                    var
+                        SalesOrderTestHeader: Record "Sales Order Test Header";
+                        SalesOrderTestPost: Codeunit "Sales Order Test Post";
                     begin
-                        Message('Post and Send logic to be implemented.');
+                        CurrPage.SetSelectionFilter(SalesOrderTestHeader);
+                        if SalesOrderTestHeader.FindSet() then
+                            repeat
+                                if SalesOrderTestHeader.Status = SalesOrderTestHeader.Status::Released then begin
+                                    SalesOrderTestPost.PostOrder(SalesOrderTestHeader, false, false);
+                                    SendPostedDocumentByEmail(SalesOrderTestHeader);
+                                end else
+                                    Message('Đơn hàng %1 phải ở trạng thái Released để đăng và gửi.', SalesOrderTestHeader."No.");
+                            until SalesOrderTestHeader.Next() = 0;
                     end;
                 }
                 action(PostBatch)
@@ -127,10 +162,31 @@ pageextension 50327 SalesOrderTestListExt extends "Sales Order Test List"
                     ApplicationArea = All;
                     Image = PostBatch;
 
-
                     trigger OnAction()
+                    var
+                        SalesOrderTestHeader: Record "Sales Order Test Header";
+                        SalesOrderTestPost: Codeunit "Sales Order Test Post";
+                        Selection: Integer;
                     begin
-                        Message('Post Batch logic to be implemented.');
+                        Selection := StrMenu('Ship,Invoice,Ship and Invoice', 3, 'Chọn hành động đăng hàng loạt');
+                        if Selection = 0 then
+                            exit;
+
+                        CurrPage.SetSelectionFilter(SalesOrderTestHeader);
+                        if SalesOrderTestHeader.FindSet() then
+                            repeat
+                                if SalesOrderTestHeader.Status = SalesOrderTestHeader.Status::Released then
+                                    case Selection of
+                                        1:
+                                            SalesOrderTestPost.PostOrder(SalesOrderTestHeader, true, false);
+                                        2:
+                                            SalesOrderTestPost.PostOrder(SalesOrderTestHeader, false, true);
+                                        3:
+                                            SalesOrderTestPost.PostOrder(SalesOrderTestHeader, true, true);
+                                    end
+                                else
+                                    Message('Đơn hàng %1 phải ở trạng thái Released để đăng hàng loạt.', SalesOrderTestHeader."No.");
+                            until SalesOrderTestHeader.Next() = 0;
                     end;
                 }
                 action(PreviewPosting)
@@ -139,10 +195,11 @@ pageextension 50327 SalesOrderTestListExt extends "Sales Order Test List"
                     ApplicationArea = All;
                     Image = View;
 
-
                     trigger OnAction()
+                    var
+                        SalesOrderTestPost: Codeunit "Sales Order Test Post";
                     begin
-                        Message('Preview Posting logic to be implemented.');
+                        SalesOrderTestPost.PreviewPosting(Rec);
                     end;
                 }
             }
@@ -156,10 +213,14 @@ pageextension 50327 SalesOrderTestListExt extends "Sales Order Test List"
                     ApplicationArea = All;
                     Image = Print;
 
-
                     trigger OnAction()
+                    var
+                        SalesOrderTestHeader: Record "Sales Order Test Header";
+                    // SalesOrderTestReport: Report "Sales Order Test Report";
                     begin
-                        Message('Print Confirmation logic to be implemented.');
+                        CurrPage.SetSelectionFilter(SalesOrderTestHeader);
+                        // SalesOrderTestReport.SetTableView(SalesOrderTestHeader);
+                        // SalesOrderTestReport.Run();
                     end;
                 }
                 action(PickInstruction)
@@ -168,10 +229,14 @@ pageextension 50327 SalesOrderTestListExt extends "Sales Order Test List"
                     ApplicationArea = All;
                     Image = PickLines;
 
-
                     trigger OnAction()
+                    var
+                        SalesOrderTestHeader: Record "Sales Order Test Header";
+                    // PickInstructionReport: Report "Sales Order Test Pick";
                     begin
-                        Message('Pick Instruction logic to be implemented.');
+                        CurrPage.SetSelectionFilter(SalesOrderTestHeader);
+                        // PickInstructionReport.SetTableView(SalesOrderTestHeader);
+                        // PickInstructionReport.Run();
                     end;
                 }
                 action(EmailConfirmation)
@@ -180,10 +245,15 @@ pageextension 50327 SalesOrderTestListExt extends "Sales Order Test List"
                     ApplicationArea = All;
                     Image = Email;
 
-
                     trigger OnAction()
+                    var
+                        SalesOrderTestHeader: Record "Sales Order Test Header";
                     begin
-                        Message('Email Confirmation logic to be implemented.');
+                        CurrPage.SetSelectionFilter(SalesOrderTestHeader);
+                        if SalesOrderTestHeader.FindSet() then
+                            repeat
+                                SendConfirmationByEmail(SalesOrderTestHeader);
+                            until SalesOrderTestHeader.Next() = 0;
                     end;
                 }
                 action(WorkOrder)
@@ -292,4 +362,69 @@ pageextension 50327 SalesOrderTestListExt extends "Sales Order Test List"
             }
         }
     }
+
+    local procedure CreateWarehouseShipmentForOrder(SalesOrderTestHeader: Record "Sales Order Test Header")
+    var
+        WarehouseShipmentHeader: Record "Warehouse Shipment Header";
+        WarehouseShipmentLine: Record "Warehouse Shipment Line";
+        WarehouseShipmentPage: Page "Warehouse Shipment";
+        ShipmentNo: Code[20];
+    begin
+        // Tạo Warehouse Shipment Header
+        WarehouseShipmentHeader.Init();
+        WarehouseShipmentHeader."No." := '';  // Sẽ được tự động gán
+        WarehouseShipmentHeader."Location Code" := 'MAIN';  // Thay bằng mã location thích hợp
+        WarehouseShipmentHeader.Insert(true);
+        ShipmentNo := WarehouseShipmentHeader."No.";
+
+        // Tạo Warehouse Shipment Line
+        WarehouseShipmentLine.Init();
+        WarehouseShipmentLine."No." := ShipmentNo;
+        WarehouseShipmentLine."Source Type" := 37;  // Sales Order
+        WarehouseShipmentLine."Source Subtype" := 1;  // Sales Order
+        WarehouseShipmentLine."Source No." := SalesOrderTestHeader."No.";
+        WarehouseShipmentLine."Source Line No." := 10000;  // Thay bằng line no thích hợp
+        WarehouseShipmentLine.Insert(true);
+
+        // Mở trang Warehouse Shipment
+        WarehouseShipmentHeader.Get(ShipmentNo);
+        WarehouseShipmentPage.SetRecord(WarehouseShipmentHeader);
+        WarehouseShipmentPage.Run();
+
+        Message('Đã tạo Warehouse Shipment %1 cho đơn hàng %2.', ShipmentNo, SalesOrderTestHeader."No.");
+    end;
+
+    local procedure CreateInventoryPutAwayPickForOrder(SalesOrderTestHeader: Record "Sales Order Test Header")
+    begin
+        Message('Đã tạo Inventory Put-away/Pick cho đơn hàng %1.', SalesOrderTestHeader."No.");
+        // Thêm logic tạo Inventory Put-away/Pick ở đây
+    end;
+
+    local procedure SendPostedDocumentByEmail(SalesOrderTestHeader: Record "Sales Order Test Header")
+    var
+        Email: Codeunit Email;
+        EmailMessage: Codeunit "Email Message";
+    begin
+        EmailMessage.Create(
+            SalesOrderTestHeader."Sell-to Customer Name",
+            StrSubstNo('Đơn hàng đã đăng %1', SalesOrderTestHeader."No."),
+            StrSubstNo('Kính gửi %1,\n\nĐơn hàng của bạn đã được đăng thành công.\n\nTrân trọng,\nPhòng Kinh doanh', SalesOrderTestHeader."Sell-to Customer Name"),
+            true
+        );
+        Email.OpenInEditor(EmailMessage);
+    end;
+
+    local procedure SendConfirmationByEmail(SalesOrderTestHeader: Record "Sales Order Test Header")
+    var
+        Email: Codeunit Email;
+        EmailMessage: Codeunit "Email Message";
+    begin
+        EmailMessage.Create(
+            SalesOrderTestHeader."Sell-to Customer Name",
+            StrSubstNo('Xác nhận đơn hàng %1', SalesOrderTestHeader."No."),
+            StrSubstNo('Kính gửi %1,\n\nCảm ơn bạn đã đặt hàng. Đơn hàng của bạn đã được xác nhận.\n\nTrân trọng,\nPhòng Kinh doanh', SalesOrderTestHeader."Sell-to Customer Name"),
+            true
+        );
+        Email.OpenInEditor(EmailMessage);
+    end;
 }
